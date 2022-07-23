@@ -12,7 +12,7 @@ import {
     Query,
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { updateUserDto } from '../dto/update-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../user.interface';
 import { UserService } from './user.service';
 
@@ -44,7 +44,7 @@ export class UserController {
     }
 
     @Put(':id')
-    updateUser(@Param('id') id: string, @Body() userData: updateUserDto) {
+    updateUser(@Param('id') id: string, @Body() userData: UpdateUserDto) {
         if (!this.userSrv.checkUserExist(userData.login)) {
             return this.userSrv.updateUser(id, userData);
         } else {

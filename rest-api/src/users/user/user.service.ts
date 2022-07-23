@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../user.interface';
 import { v4 } from 'uuid';
-import { updateUserDto } from '../dto/update-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -63,7 +63,7 @@ export class UserService {
         return { id: id, isDeleted: false, ...user };
     }
 
-    updateUser(id: string, userData: updateUserDto) {
+    updateUser(id: string, userData: UpdateUserDto) {
         const updUser: User = this.usersBase.find((user) => {
             return user.id === id && !user.isDeleted;
         });

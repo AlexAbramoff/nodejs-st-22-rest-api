@@ -55,8 +55,19 @@ export class UserService {
         return this.findUser(id);
     }
 
+    checkUserExist(login: string): boolean {
+        if (
+            this.usersBase.find((user) => {
+                return user.login === login;
+            })
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     createUser(user: CreateUserDto) {
-        let id: string = v4();
+        const id: string = v4();
         this.usersBase.push({ id: id, isDeleted: false, ...user });
         return { id: id, isDeleted: false, ...user };
     }

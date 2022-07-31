@@ -6,19 +6,20 @@ import {
     HttpCode,
     HttpException,
     HttpStatus,
+    NotFoundException,
     Param,
     Post,
     Put,
     Query,
 } from '@nestjs/common';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { User } from '../user.interface';
-import { UserService } from './user.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { UsersService } from './users.service';
 
-@Controller('users')
+@Controller('v1/users')
 export class UserController {
-    constructor(private userSrv: UserService) {}
+    constructor(private userSrv: UsersService) {}
 
     @Get()
     getAutoSuggestUsers(
@@ -30,7 +31,12 @@ export class UserController {
 
     @Get(':id')
     getById(@Param('id') id: string): User {
-        return this.userSrv.getById(id);
+        const user = this.userSrv.getById(id);
+        if (user) {
+            return user;
+        } else {
+            throw new NotFoundException('User not found');
+        }
     }
 
     @Post()
@@ -55,6 +61,10 @@ export class UserController {
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     deleteUser(@Param('id') id: string) {
-        return this.userSrv.removeUser(id);
+        if (this.userSrv.getById(id)) {
+            return this.userSrv.removeUser(id);
+        } else {
+            throw new NotFoundException('User not found');
+        }
     }
 }

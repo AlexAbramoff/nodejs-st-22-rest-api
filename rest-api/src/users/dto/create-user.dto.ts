@@ -5,7 +5,7 @@ export class CreateUserDto {
     login: string;
 
     @IsNotEmpty()
-    @Matches(/[0-9A-Fa-f]/g, {
+    @Matches(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/, {
         message: 'Password must contain letters and numbers',
     })
     password: string;

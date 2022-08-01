@@ -1,23 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { v4 } from 'uuid';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InMemoryUsersRepository } from './repository/in-memory.users.repository';
+import { PostgresRepository } from './repository/postgres.users.repository';
 
 @Injectable()
 export class UsersService {
-    constructor(private inMemRep: InMemoryUsersRepository) {}
+    constructor(private usersRep: PostgresRepository) {}
 
-    getAll() {
-        return this.inMemRep.findAll();
-    }
-
-    getAutoSuggestUsers(loginSubstring: string = '', limit?: number) {
+    async getAll(loginSubstring: string = '', limit?: number) {
+        const users = await this.usersRep.findAll();
         if (!limit || limit < 1) {
-            limit = this.inMemRep.findAll().length;
+            limit = users.length;
         }
         if (loginSubstring || limit) {
-            return this.inMemRep
-                .findAll()
+            return users
                 .filter((user) => {
                     return (
                         user.login.includes(loginSubstring) && !user.isDeleted
@@ -38,36 +35,41 @@ export class UsersService {
         }
     }
 
-    getById(id: string) {
-        return this.inMemRep.findById(id);
+    async getById(id: string) {
+        const user = this.usersRep.findById(id);
+        return user;
     }
 
-    checkUserExist(login: string): boolean {
+    async checkUserExist(login: string) {
+        const users = await this.usersRep.findAll();
         if (
-            this.inMemRep.findAll().find((user) => {
+            users.find((user) => {
                 return user.login === login;
             })
         ) {
             return true;
-        }
-        return false;
-    }
-
-    createUser(user: CreateUserDto) {
-        if (this.checkUserExist(user.login)) {
+        } else {
             return false;
         }
-        return this.inMemRep.create(user);
     }
 
-    updateUser(id: string, userData: UpdateUserDto) {
-        if (this.checkUserExist(userData.login)) {
-            return false;
+    async createUser(userDto: CreateUserDto) {
+        const id = v4();
+        const userModel = { id, ...userDto };
+        const user = await this.usersRep.create(userModel);
+        return user;
+    }
+
+    async updateUser(id: string, userData: UpdateUserDto) {
+        return this.usersRep.update(id, userData);
+    }
+
+    async removeUser(id: string) {
+        const user = await this.getById(id);
+        if (user) {
+            return await this.usersRep.delete(id);
+        } else {
+            return null;
         }
-        return this.inMemRep.update(id, userData);
-    }
-
-    removeUser(id: string) {
-        return this.inMemRep.delete(id);
     }
 }

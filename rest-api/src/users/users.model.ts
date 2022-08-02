@@ -1,12 +1,5 @@
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
-interface UserCreationAttr {
-    id: string;
-    login: string;
-    password: string;
-    age: number;
-}
-
 @Table({ tableName: 'users' })
 class User extends Model<User> {
     @Column({

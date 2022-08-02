@@ -1,4 +1,4 @@
-import { Repository } from '../interfaces/repository.interface';
+import { Repository } from '../repository.interface';
 
 interface UsersRepository extends Repository {}
 
